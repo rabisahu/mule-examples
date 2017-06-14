@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:apachekafka="http://www.mulesoft.org/schema/mule/apachekafka" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apachekafka http://www.mulesoft.org/schema/mule/apachekafka/current/mule-apachekafka.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
+    <apachekafka:config name="Apache_Kafka__Configuration" bootstrapServers="localhost:9092" consumerPropertiesFile="consumer.properties" producerPropertiesFile="producer.properties" doc:name="Apache Kafka: Configuration"/>
+    <flow name="my_kafka_ProducerFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/kafka" doc:name="HTTP"/>
+        <apachekafka:producer config-ref="Apache_Kafka__Configuration" topic="mykafkatopic" key="#[server.dateTime.getMilliSeconds()" doc:name="Apache Kafka"/>
+    </flow>
+    <flow name="my_kafka_ConsumerFlow1">
+        <apachekafka:consumer config-ref="Apache_Kafka__Configuration" topic="mykafkatopic" partitions="2" doc:name="my_kafka_ConsumerFlow1"/>
+        <logger message="-----CONSUMER-1-----#[payload]" level="INFO" doc:name="Logger"/>
+    </flow>
+</mule>
